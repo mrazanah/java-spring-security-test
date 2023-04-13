@@ -16,16 +16,13 @@ Create a RESTful API using Java Spring Boot that implements a user authenticatio
 
 - Allow users to register by providing a unique username and password.
 - Allow users to log in by providing their username and password.
-- Allow users to retrieve their own profile information, such as their username and email address.
-- Allow users with administrative privileges to retrieve and modify profile information for all users. (Optional if you have time)
+- Allow users to retrieve their own profile information, such as their username and email address. (Optional if you have time)
 - Use JSON Web Tokens (JWT) to authenticate and authorize API requests.
 
 In addition, the API should include the following:
 
 - Input validation to ensure that only valid data is entered into the database.
-- Please consider default role for user once sign up where this role is allowing them to call his own profile update apo
-- Unit tests to ensure that the authentication and authorization system functions correctly.
-- Integration tests to ensure that the API functions correctly when used in combination with a front-end application. (Optional if you have time)
+- Unit tests to ensure that the authentication and authorization system functions correctly. (Optional if you have time)
 
 ## Code delivery
 - Make sure to use GIT, and to commit your changes following Angular git commit conection https://www.conventionalcommits.org/en/v1.0.0-beta.4/
