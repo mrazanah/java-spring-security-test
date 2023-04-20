@@ -29,5 +29,6 @@ public class User {
         this.lastname = entity.getLastname();
         this.creationDate = entity.getCreationDate();
         this.lastLoginDate = entity.getLastLoginDate();
+        this.phone = entity.getPhone();
     }
 }

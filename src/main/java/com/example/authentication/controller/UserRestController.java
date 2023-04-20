@@ -6,6 +6,7 @@ import com.example.authentication.exception.AuthenticationException;
 import com.example.authentication.exception.FormValidationException;
 import com.example.authentication.form.LoginForm;
 import com.example.authentication.form.UserCreationForm;
+import com.example.authentication.form.UserUpdateForm;
 import com.example.authentication.jwt.JwtTokenProvider;
 import com.example.authentication.service.UserService;
 import com.example.authentication.service.UserValidationService;
@@ -27,6 +28,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @RestController
@@ -65,7 +69,7 @@ public class UserRestController {
         }
         return ResponseEntity.ok("logged out");
     }
-    @PostMapping("/signup")
+    @PostMapping
     public ResponseEntity<User> signup(@RequestBody UserCreationForm form) {
         BindingResult bindingResult = new BeanPropertyBindingResult(form, "form");
         validationService.validate(form, bindingResult);
@@ -88,8 +92,25 @@ public class UserRestController {
         log.info("User {}: login successful", user.getUsername());
         user.setLastLoginDate(System.currentTimeMillis());
         userService.save(user);
-        String jwtToken = jwtTokenProvider.generateToken(auth);
-        request.setAttribute("Authorization", "Bearer " + jwtToken);
-        return ResponseEntity.ok(jwtToken);
+        return ResponseEntity.ok(jwtTokenProvider.generateToken(auth));
+    }
+    @PutMapping
+    public ResponseEntity<User> update(
+            @AuthenticationPrincipal CustomUserDetails userDetails, @RequestBody UserUpdateForm form) {
+        User user = userService.findByUserId(userDetails.getUser().getId());
+        updateField(user::setFirstname, form.getFirstname());
+        updateField(user::setLastname, form.getLastname());
+        updateField(user::setPhone, form.getPhone());
+        return ResponseEntity.ok(userService.save(user));
+    }
+    @DeleteMapping
+    public ResponseEntity<String> deleteUser(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        Long id = userDetails.getUser().getId();
+        User user = userService.findByUserId(id);
+        userService.deleteUser(id);
+        return ResponseEntity.ok("User ".concat(user.getUsername()).concat(" deleted"));
+    }
+    private <T> void updateField(Consumer<T> setter, T value) {
+        Optional.ofNullable(value).ifPresent(setter);
     }
 }

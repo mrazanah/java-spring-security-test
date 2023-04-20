@@ -1,6 +1,7 @@
 package com.example.authentication.config;
 
-import com.example.authentication.jwt.JwtAuthenticationFilter;
+import com.example.authentication.filter.FilterChainExceptionHandler;
+import com.example.authentication.filter.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -38,17 +39,19 @@ public class AppConfig {
     @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
     @Autowired
+    private FilterChainExceptionHandler filterChainExceptionHandler;
+    @Autowired
     private AuthenticationConfiguration cfg;
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http.cors().and().csrf().disable()
                 .authorizeHttpRequests()
-                .requestMatchers("/rest/authentication/login").permitAll()
                 .requestMatchers("/rest/authentication/signup").permitAll()
                 .requestMatchers("/rest/authentication").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(filterChainExceptionHandler, JwtAuthenticationFilter.class)
                 .exceptionHandling()
                 .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
                 .and()

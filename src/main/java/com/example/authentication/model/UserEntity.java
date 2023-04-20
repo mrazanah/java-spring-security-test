@@ -43,5 +43,6 @@ public class UserEntity {
         this.lastname = user.getLastname();
         this.creationDate = user.getCreationDate();
         this.lastLoginDate = user.getLastLoginDate();
+        this.phone = user.getPhone();
     }
 }

@@ -1,6 +1,7 @@
 package com.example.authentication.jwt;
 
 import com.example.authentication.domain.CustomUserDetails;
+import com.example.authentication.exception.JwtProcessingException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.extern.slf4j.Slf4j;
@@ -45,22 +46,33 @@ public class JwtTokenProvider {
         return claims.getSubject();
     }
 
+    public void expireToken(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(key).build()
+                .parseClaimsJws(token)
+                .getBody().setExpiration(new Date());
+    }
+
     public boolean validateToken(String authToken) {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(authToken);
             return true;
         } catch (SignatureException ex) {
-            log.error("Invalid JWT signature");
+            handleException("Invalid JWT signature");
         } catch (MalformedJwtException ex) {
-            log.error("Invalid JWT token");
+            handleException("Invalid JWT token");
         } catch (ExpiredJwtException ex) {
-            log.error("Expired JWT token");
+            handleException("Expired JWT token");
         } catch (UnsupportedJwtException ex) {
-            log.error("Unsupported JWT token");
+            handleException("Unsupported JWT token");
         } catch (IllegalArgumentException ex) {
-            log.error("JWT claims string is empty.");
+            handleException("JWT claims string is empty.");
         }
         return false;
+    }
+    private void handleException(String message) {
+        log.error(message);
+        throw new JwtProcessingException(message);
     }
 }
 
