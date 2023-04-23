@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -45,11 +46,11 @@ public class AppConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http.cors().and().csrf().disable()
-                .authorizeHttpRequests()
-                .requestMatchers("/rest/authentication/signup").permitAll()
-                .requestMatchers("/rest/authentication").permitAll()
-                .anyRequest().authenticated()
-                .and()
+                .authorizeHttpRequests(authCustomizer -> authCustomizer
+                    .requestMatchers("/rest/authentication/login").permitAll()
+                    .requestMatchers(HttpMethod.POST,"/rest/authentication").permitAll()
+                    .anyRequest().authenticated()
+                )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(filterChainExceptionHandler, JwtAuthenticationFilter.class)
                 .exceptionHandling()
